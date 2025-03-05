@@ -1,0 +1,10 @@
+build
+dist
+node_modules
+.env
+.gitignore
+.prettierignore
+.prettierrc
+LICENSE
+README.md
+yarn.lock

@@ -1,0 +1,38 @@
+{
+	"include": [
+		"**/*.ts",
+		"**/*.tsx",
+		"**/.server/**/*.ts",
+		"**/.server/**/*.tsx",
+		"**/.client/**/*.ts",
+		"**/.client/**/*.tsx",
+		"vite.config.ts",
+		".storybook/sb-vite.config.ts"
+	],
+	"exclude": ["node_modules"],
+	"compilerOptions": {
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"types": ["@remix-run/node", "vite/client"],
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"jsx": "react-jsx",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"resolveJsonModule": true,
+		"target": "ESNext",
+		"strict": true,
+		"allowJs": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": "server",
+		"paths": {
+			"@root/*": ["../*"],
+			"~/*": ["../app/*"],
+			"@/*": ["./*"],
+			"@config": ["./core/util/config"],
+			"@logger": ["./core/util/logger"]
+		},
+		"noEmit": false,
+		"outDir": "dist"
+	}
+}
