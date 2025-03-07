@@ -1,29 +1,55 @@
-import { useState } from "react";
-import { Button } from "~/components/shadcn/ui/button";
+import { useEffect, useState } from "react";
 import { useSocket } from "~/hooks/use-socket";
+import { useLocalStorage } from "usehooks-ts";
+import ShortUniqueId from "short-unique-id";
+import Mobile from "~/components/Mobile";
+import Desktop from "~/components/Desktop";
 
 export function meta() {
-	return [{ title: "Home" }];
+	return [{ title: "Broses Party Pack" }];
+}
+
+export async function loader() {
+	return {
+		meta: (await import("../../server/services/GameService/meta.json")).default
+	};
 }
 
 export default function Index() {
-	const [count, setCount] = useState(0);
+	const [isMobile, setIsMobile] = useState<boolean | null>(null);
+	const [deviceID, setDeviceID] = useLocalStorage("deviceID", "");
+	const [socketSetup, setSocketSetup] = useState(false);
 	const socket = useSocket();
-	socket.on("heartbeat", () => {
-		setCount((prevCount) => prevCount + 1);
+
+	socket.on("setupClient", () => {
+		setSocketSetup(true);
 	});
-	return (
-		<div className="flex flex-col items-center justify-center text-center w-full h-screen">
-			<h1>Welcome to the Node FullStack Template</h1>
-			<p>This is a basic template for building fullstack applications with Node.js.</p>
-			<p className="text-2xl font-bold">{count}</p>
-			<p className="text-2xl font-bold">{socket.latency}ms</p>
-			<div className="flex flex-row gap-4">
-				<Button className="mb-4" onClick={() => socket.emit("click/start")}>
-					Start Heartbeat
-				</Button>
-				<Button onClick={() => socket.emit("click/stop")}>Stop Heartbeat</Button>
+
+	let content;
+	if (isMobile == null || !socketSetup) {
+		content = (
+			<div className="fixed inset-0 w-full h-full">
+				<div className="flex items-center justify-center h-full">
+					<div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+				</div>
 			</div>
-		</div>
-	);
+		);
+	} else if (isMobile) {
+		content = <Mobile />;
+	} else {
+		content = <Desktop />;
+	}
+
+	useEffect(() => {
+		const testResult = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent);
+		setIsMobile(testResult);
+		let uuid = deviceID;
+		if (!uuid) {
+			uuid = new ShortUniqueId().randomUUID(32);
+			setDeviceID(uuid);
+		}
+		socket.emit("setupClient", uuid, testResult ? "mobile" : "desktop");
+	}, []);
+
+	return content;
 }

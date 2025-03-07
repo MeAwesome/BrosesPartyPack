@@ -1,14 +1,14 @@
 {
-	"enablePWA": true,
+	"enablePWA": false,
 	"services": {
 		"core": {
 			"http": {
-				"port": 4444
+				"port": 5555
 			},
 			"websocket": {
 				"enabled": true,
 				"latencyCheck": {
-					"enabled": true,
+					"enabled": false,
 					"interval": 1000
 				}
 			}

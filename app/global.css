@@ -142,3 +142,45 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+body {
+	user-select: none;
+	overscroll-behavior: none;
+}
+
+.slick-dots li button:before {
+	color: #b9bd9a !important;
+}
+
+.slick-dots li.slick-active button:before {
+	color: #007aff !important;
+}
+
+.slick-list {
+	mask-image: linear-gradient(to right, transparent 0%, white 10%, white 90%, transparent 100%);
+}
+
+#main-menu-home-scroll-area > div > div {
+	display: block !important;
+	width: 100% !important;
+	height: 100% !important;
+}
+
+@media all and (max-aspect-ratio: 16/9) {
+	.size-full-16\/9 {
+		width: 100%;
+	}
+}
+
+@media all and (min-aspect-ratio: 16/9) {
+	.size-full-16\/9 {
+		height: 100%;
+	}
+}
+
+@media all and (aspect-ratio: 16/9) {
+	.size-full-16\/9 {
+		height: 100%;
+		width: 100%;
+	}
+}

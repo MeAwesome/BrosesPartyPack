@@ -1,0 +1,47 @@
+[
+	{
+		"id": "familyfeud",
+		"name": "Family Feud: Broses Edition",
+		"tagline": "Survey says...",
+		"description": "How well do you know the Broses Discord? Test your knowledge by guessing the most popular answers to survey questions! This game pulls its answers directly from the Discord server in real time, so its never the same game twice! The team with the most points wins!",
+		"players": "3-11",
+		"audience": true,
+		"usesAI": false
+	},
+	{
+		"id": "quotelash",
+		"name": "QuoteLash",
+		"tagline": "Don't quote me on that!",
+		"description": "Finish the quote! Players are given a prompt and must fill in the blank with the funniest or most fitting response. All prompts are taken directly from real Broses Discord messages. The players and audience vote on the best answer, and the player with the most votes wins!",
+		"players": "3-8",
+		"audience": true,
+		"usesAI": true
+	},
+	{
+		"id": "backgroundcheck",
+		"name": "Background Check",
+		"tagline": "So... am I hired?",
+		"description": "Players are given images taken from Broses Instagram posts and must come up with the funniest caption. Players will also upload images from their phones in later rounds while others create new captions. The players and audience vote on the posts, and the player with the most votes wins!",
+		"players": "3-8",
+		"audience": true,
+		"usesAI": false
+	},
+	{
+		"id": "ballslmao",
+		"name": "Balls-Lmao Balls-Lmao",
+		"tagline": "Turn depression into comedy!",
+		"description": "Players are given an interview question and words that have been posted in the Broses #balls-lmao Discord channel. Use any combination of words to answer the interviewer's questions. The players and audience vote on the best answer, and the player with the most votes wins!",
+		"players": "3-8",
+		"audience": true,
+		"usesAI": true
+	},
+	{
+		"id": "knowme",
+		"name": "You Don't Know Me",
+		"tagline": "There's an imposter among us!",
+		"description": "Each player is assigned the same Broses member to impersonate, except one. The imposter must blend in with the other players while everyone else tries to figure out who the imposter is. The players vote on who they think the imposter is, and the imposter wins if they are not caught!",
+		"players": "3-10",
+		"audience": false,
+		"usesAI": false
+	}
+]

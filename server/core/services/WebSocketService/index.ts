@@ -66,13 +66,17 @@ export class WebSocketService extends Service {
 						logger.error(`Error in WebSocket route ${routeEventPath}: ${error}`);
 					}
 				});
-				logger.verbose(`WebSocket route registered: ${routeEventPath}`);
+				// logger.verbose(`WebSocket route registered: ${routeEventPath}`);
 				if (routeEventPath === "connect") {
 					routeModule(socket);
 				}
 			}
 		});
 		logger.debug("WebSocket routes registered");
+	}
+
+	public getServer(): Server {
+		return this.socketServer;
 	}
 }
 
