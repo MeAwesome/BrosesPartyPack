@@ -4,6 +4,7 @@ import { useLocalStorage } from "usehooks-ts";
 import ShortUniqueId from "short-unique-id";
 import Mobile from "~/components/Mobile";
 import Desktop from "~/components/Desktop";
+import { useLoaderData } from "@remix-run/react";
 
 export function meta() {
 	return [{ title: "Broses Party Pack" }];
@@ -11,11 +12,16 @@ export function meta() {
 
 export async function loader() {
 	return {
-		meta: (await import("../../server/services/GameService/meta.json")).default
+		meta: (await import("../../server/services/GameService/meta.json")).default,
+		fonts: {
+			herticalsans: (await import("../../public/fonts/herticalsans.json")).default,
+			monoton: (await import("../../public/fonts/monoton.json")).default,
+		}
 	};
 }
 
 export default function Index() {
+	const loaderData = useLoaderData<typeof loader>();
 	const [isMobile, setIsMobile] = useState<boolean | null>(null);
 	const [deviceID, setDeviceID] = useLocalStorage("deviceID", "");
 	const [socketSetup, setSocketSetup] = useState(false);
@@ -37,12 +43,13 @@ export default function Index() {
 	} else if (isMobile) {
 		content = <Mobile />;
 	} else {
-		content = <Desktop />;
+		content = <Desktop loaderData={loaderData} />;
 	}
 
 	useEffect(() => {
 		const testResult = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator?.userAgent);
-		setIsMobile(testResult);
+		const isDiscordActivity = window.location.href.includes("discordsays.com");
+		setIsMobile(testResult && !isDiscordActivity);
 		let uuid = deviceID;
 		if (!uuid) {
 			uuid = new ShortUniqueId().randomUUID(32);

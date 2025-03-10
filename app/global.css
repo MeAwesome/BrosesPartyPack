@@ -148,6 +148,10 @@ body {
 	overscroll-behavior: none;
 }
 
+.hide-mouse {
+	cursor: none !important;
+}
+
 .slick-dots li button:before {
 	color: #b9bd9a !important;
 }

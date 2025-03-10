@@ -15,7 +15,9 @@ export function SocketProvider({ children, config }: SocketProviderProps) {
 
 	// @ts-expect-error testing
 	if (!socketRef.current && config.enabled) {
-		socketRef.current = io();
+		socketRef.current = io({
+			path: "/.proxy/socketio"
+		});
 		// @ts-expect-error testing
 		if (config.latencyCheck.enabled) {
 			setInterval(() => {

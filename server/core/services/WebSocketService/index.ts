@@ -20,7 +20,9 @@ export class WebSocketService extends Service {
 	public async start(): Promise<void> {
 		logger.verbose("Waiting for HTTP service to start...");
 		await HTTPService.waitForActivation();
-		this.socketServer = new Server(HTTPService.getServer().server);
+		this.socketServer = new Server(HTTPService.getServer().server, {
+			path: "/.proxy/socketio"
+		});
 		await this.registerRoutes();
 		logger.verbose("WebSocket service started");
 	}

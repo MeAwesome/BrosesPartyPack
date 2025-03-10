@@ -14,8 +14,7 @@ export function links() {
 	return [
 		{ rel: "stylesheet", href: globalStylesheet },
 		{ rel: "stylesheet", href: slickStylesheet },
-		{ rel: "stylesheet", href: slickThemeStylesheet },
-		{ rel: "icon", href: "data:image/x-icon;base64,AA" }
+		{ rel: "stylesheet", href: slickThemeStylesheet }
 	];
 }
 
@@ -37,7 +36,6 @@ export default function Root() {
 					content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"
 				/>
 				<Meta />
-				{config.enablePWA && <link rel="manifest" href="/manifest.webmanifest" />}
 				<Links />
 			</head>
 			<body>
