@@ -22,7 +22,7 @@ export default function RoomCodeInput({
 					if (e.target.value.length > code.length && code.length >= 4) return;
 					const regex = /^[A-Za-z]*$/;
 					if (!regex.exec(e.target.value)) return;
-					onCodeUpdate(e.target.value.toUpperCase());
+					onCodeUpdate(e.target.value.toUpperCase().substring(0, 4));
 				}}
 				className="bg-[#1F2937] font-bold text-lg h-10"
 			/>

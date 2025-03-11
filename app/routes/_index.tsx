@@ -16,6 +16,7 @@ export async function loader() {
 		fonts: {
 			herticalsans: (await import("../../public/fonts/herticalsans.json")).default,
 			monoton: (await import("../../public/fonts/monoton.json")).default,
+			audiowide: (await import("../../public/fonts/audiowide.json")).default
 		}
 	};
 }
@@ -55,7 +56,10 @@ export default function Index() {
 			uuid = new ShortUniqueId().randomUUID(32);
 			setDeviceID(uuid);
 		}
-		socket.emit("setupClient", uuid, testResult ? "mobile" : "desktop");
+		socket.emit("setupClient", {
+			deviceID: uuid,
+			client: testResult ? "mobile" : "desktop"
+		});
 	}, []);
 
 	return content;

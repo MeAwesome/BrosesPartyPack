@@ -7,18 +7,53 @@ import MeAwesomeGamesLogo from "~/components/mobile/main-menu/home/MeAwesomeGame
 import ImageCarousel from "~/components/mobile/main-menu/home/ImageCarousel";
 import PreviousGames from "~/components/mobile/main-menu/home/PreviousGames";
 import { Suspense, useEffect, useState } from "react";
+import { useSocket } from "~/hooks/use-socket";
+import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
+import { RoomJoinErrorData, RoomJoinSuccessData, RoomReconnectedData, RoomSearchErrorData, RoomSearchSuccessData } from "@/services/GameService/types";
 
 export default function Home() {
 	const { setMenu } = useMenu();
-
-	const [roomCode, setRoomCode] = useState("");
+	const socket = useSocket();
+	
+	const deviceID = useReadLocalStorage("deviceID");
+	const [savedCode, setSavedCode] = useLocalStorage("code", "");
+	const [savedName, setSavedName] = useLocalStorage("name", "");
+	const [roomCode, setRoomCode] = useState(savedCode ?? "");
+	const [name, setName] = useState(savedName ?? "");
 	const [gameName, setGameName] = useState("");
-	const [name, setName] = useState("");
 	const [charsLeft, setCharsLeft] = useState(12);
+	const [buttonDisabled, setButtonDisabled] = useState(true);
+
+	socket.on("room/search/success", (data: RoomSearchSuccessData) => {
+		setGameName(data.gameName);
+	});
+
+	socket.on("room/search/error", (error: RoomSearchErrorData) => {
+		setGameName(error.message);
+	});
+
+	socket.on("room/join/success", (data: RoomJoinSuccessData) => {
+		setSavedCode(data.roomCode);
+		setSavedName(data.playerName);
+		setMenu(data.gameMeta.id);
+	});
+
+	socket.on("room/reconnected", (data: RoomReconnectedData) => {
+		setSavedCode(data.roomCode);
+		setSavedName(data.playerName);
+		setMenu(data.gameMeta.id);
+	});
+
+	socket.on("room/join/error", (error: RoomJoinErrorData) => {
+		setSavedCode("");
+		setRoomCode("");
+	});
 
 	useEffect(() => {
 		if (roomCode.length === 4) {
-			setGameName("testing");
+			socket.emit("room/search", {
+				roomCode: roomCode
+			});
 		} else {
 			setGameName("");
 		}
@@ -27,6 +62,10 @@ export default function Home() {
 	useEffect(() => {
 		setCharsLeft(12 - name.length);
 	}, [name]);
+
+	useEffect(() => {
+		setButtonDisabled(roomCode.length !== 4 || name.length === 0 || gameName === "" || gameName === "Room not found");
+	}, [roomCode, name, gameName]);
 
 	return (
 		<div className="fixed inset-0 size-full bg-[#0a1420] text-white">
@@ -39,10 +78,17 @@ export default function Home() {
 						<RoomCodeInput code={roomCode} onCodeUpdate={setRoomCode} gameName={gameName} />
 						<NameInput name={name} onNameUpdate={setName} charsLeft={charsLeft} />
 						<Button
-							className="bg-[#4254F4] text-white font-bold w-4/5 h-12.5 rounded-lg text-xl"
-							onClick={() => setMenu("insert-game-here")}
+							className={`hover:bg-[${buttonDisabled ? "#1F2937" : "#4254F4"}] bg-[${buttonDisabled ? "#1F2937" : "#4254F4"}] text-white font-bold w-4/5 h-12.5 rounded-lg text-xl`}
+							onClick={() => {
+								socket.emit("room/join", {
+									deviceID: deviceID,
+									roomCode: roomCode,
+									playerName: name
+								});
+							}}
+							disabled={buttonDisabled}
 						>
-							PLAY
+							{(roomCode !== "" && roomCode == savedCode) ? "RECONNECT" : "PLAY"}
 						</Button>
 						<p className="text-xs font-light text-nowrap">
 							By clicking PLAY, you agree to our{" "}

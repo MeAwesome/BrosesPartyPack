@@ -22,7 +22,7 @@ export default function NameInput({
 					if (e.target.value.length > name.length && charsLeft <= 0) return;
 					const regex = /^[\x20-\x7F]*$/;
 					if (!regex.exec(e.target.value)) return;
-					onNameUpdate(e.target.value.toUpperCase().trimStart());
+					onNameUpdate(e.target.value.toUpperCase().substring(0, 12).trimStart());
 				}}
 				className="bg-[#1F2937] font-bold text-lg h-10"
 			/>

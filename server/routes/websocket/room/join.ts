@@ -1,5 +1,8 @@
 import { Socket } from "socket.io";
 
-export default async function join(socket: Socket, room: string) {
-	socket.join(room);
+import GameService from "@/services/GameService";
+import { PlayerJoinData } from "@/services/GameService/types";
+
+export default async function join(socket: Socket, data: PlayerJoinData) {
+	GameService.joinGame(socket, data);
 }
