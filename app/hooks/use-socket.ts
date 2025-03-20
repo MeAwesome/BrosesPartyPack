@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useEffect } from "react";
 import { SocketContext, SocketLatencyContext } from "~/providers/socket-provider";
 
@@ -23,6 +22,14 @@ export function useSocket() {
 		off: (event: string) => {
 			socket.off(event);
 		},
-		latency: latency
+		latency: latency,
+		connected: socket.connected,
+		disconnected: socket.disconnected,
+		connect: () => {
+			socket.connect();
+		},
+		disconnect: () => {
+			socket.disconnect();
+		}
 	};
 }

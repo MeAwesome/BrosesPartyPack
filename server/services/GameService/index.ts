@@ -11,7 +11,6 @@ import { GameMeta, PlayerJoinData, RoomCreateData } from "@/services/GameService
 import WebSocketService from "@/core/services/WebSocketService";
 
 export class GameService extends Service {
-
 	private readonly games: Map<string, Game>;
 	private readonly uid: ShortUniqueId;
 
@@ -33,7 +32,6 @@ export class GameService extends Service {
 		return this.games.get(roomCode);
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	public getMeta(): any {
 		return meta;
 	}
@@ -51,7 +49,7 @@ export class GameService extends Service {
 		}
 		this.games.set(code, game);
 		socket.join(code);
-		socket.emit("room/created", {
+		socket.emit("room/create/success", {
 			roomCode: code
 		});
 	}
@@ -60,6 +58,10 @@ export class GameService extends Service {
 		const game = this.games.get(data.roomCode);
 		if (game) {
 			game.join(socket, data);
+		} else if (data.reconnectAttempt) {
+			socket.emit("room/reconnect/error", {
+				message: "Game no longer exists"
+			});
 		} else {
 			socket.emit("room/join/error", {
 				message: "Room not found"
@@ -70,7 +72,8 @@ export class GameService extends Service {
 	public destroyGame(roomCode: string): void {
 		const game = this.games.get(roomCode);
 		if (game) {
-			WebSocketService.getServer().to(roomCode).emit("room/destroyed");
+			WebSocketService.getServer().to(roomCode).emit("room/destroy/success");
+			WebSocketService.getServer().in(roomCode).socketsLeave(roomCode);
 		}
 		this.games.delete(roomCode);
 	}
@@ -79,6 +82,16 @@ export class GameService extends Service {
 		const roomCode = this.getRoomCodeBySocket(socket);
 		if (roomCode) {
 			this.destroyGame(roomCode);
+		}
+	}
+
+	public setRoomReadyBySocket(socket: Socket) {
+		const roomCode = this.getRoomCodeBySocket(socket);
+		if (roomCode) {
+			const game = this.games.get(roomCode);
+			if (game) {
+				game.ready();
+			}
 		}
 	}
 
@@ -103,7 +116,6 @@ export class GameService extends Service {
 		}
 		throw new Error("No meta found: " + gameID);
 	}
-
 }
 
 export default new GameService();

@@ -15,7 +15,16 @@
 		},
 		"project": {
 			"discord": {
-				"token": "env.DISCORD_TOKEN"
+				"token": "env.DISCORD_TOKEN",
+				"guildID": "767599563975426049",
+				"ownerID": "564597179910586369",
+				"botChannelID": "770671267345989644",
+				"clientID": "env.DISCORD_CLIENT_ID"
+			},
+			"elasticsearch": {
+				"url": "env.ELASTICSEARCH_URL",
+				"apiKey": "env.ELASTICSEARCH_API_KEY",
+				"index": "brosespartypack"
 			}
 		}
 	}

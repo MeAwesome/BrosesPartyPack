@@ -7,6 +7,7 @@ import { Key, useEffect, useState } from "react";
 import { useEventListener } from "usehooks-ts";
 import { Howl } from "howler";
 import { useMenu } from "~/hooks/use-menu";
+import proxyURL from "~/lib/proxyURL";
 
 export default function Home({ loaderData }: { readonly loaderData: any }) {
 	const { meta } = loaderData;
@@ -17,7 +18,7 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 
 	const [backgroundMusicIntro] = useState<Howl>(
 		new Howl({
-			src: ["/.proxy/audio/music/main-menu-intro.mp3"],
+			src: [proxyURL("/audio/music/main-menu-intro.mp3")],
 			onend: () => {
 				backgroundMusicIntro.stop();
 				backgroundMusicLoop.play();
@@ -26,18 +27,18 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 	);
 	const [backgroundMusicLoop] = useState<Howl>(
 		new Howl({
-			src: ["/.proxy/audio/music/main-menu-loop.mp3"],
+			src: [proxyURL("/audio/music/main-menu-loop.mp3")],
 			loop: true
 		})
 	);
 	const [selectAnotherGameSFX] = useState<Howl>(
 		new Howl({
-			src: ["/.proxy/audio/sfx/discord-ping.mp3"]
+			src: [proxyURL("/audio/sfx/discord-ping.mp3")]
 		})
 	);
 	const [selectGameSFX] = useState<Howl>(
 		new Howl({
-			src: ["/.proxy/audio/sfx/discord-call-joined.mp3"],
+			src: [proxyURL("/audio/sfx/discord-call-joined.mp3")],
 			onplay: () => {
 				setFreezeSelection(true);
 			}
@@ -80,8 +81,13 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 		<>
 			<Background />
 			<Flex justifyContent="center" alignItems="flex-start" position={[-4, 0, 0]} rotation={[0, 0.4, 0]}>
-				{meta.map((game: { id: Key | null | undefined; name: string; }, index: number) => (
-					<GameOption key={game.id} gameName={game.name} selected={selectedGame == index} loaderData={loaderData} />
+				{meta.map((game: { id: Key | null | undefined; name: string }, index: number) => (
+					<GameOption
+						key={game.id}
+						gameName={game.name}
+						selected={selectedGame == index}
+						loaderData={loaderData}
+					/>
 				))}
 			</Flex>
 			<CameraControls />

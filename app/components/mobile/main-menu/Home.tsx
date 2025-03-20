@@ -9,17 +9,22 @@ import PreviousGames from "~/components/mobile/main-menu/home/PreviousGames";
 import { Suspense, useEffect, useState } from "react";
 import { useSocket } from "~/hooks/use-socket";
 import { useLocalStorage, useReadLocalStorage } from "usehooks-ts";
-import { RoomJoinErrorData, RoomJoinSuccessData, RoomReconnectedData, RoomSearchErrorData, RoomSearchSuccessData } from "@/services/GameService/types";
+import {
+	RoomJoinSuccessData,
+	RoomReconnectedData,
+	RoomSearchErrorData,
+	RoomSearchSuccessData
+} from "@/services/GameService/types";
 
 export default function Home() {
-	const { setMenu } = useMenu();
+	const { setMenu, setMenuData } = useMenu();
 	const socket = useSocket();
-	
+
 	const deviceID = useReadLocalStorage("deviceID");
 	const [savedCode, setSavedCode] = useLocalStorage("code", "");
 	const [savedName, setSavedName] = useLocalStorage("name", "");
-	const [roomCode, setRoomCode] = useState(savedCode ?? "");
-	const [name, setName] = useState(savedName ?? "");
+	const [roomCode, setRoomCode] = useState(savedCode !== "" ? savedCode : "");
+	const [name, setName] = useState(savedName !== "" ? savedName : "");
 	const [gameName, setGameName] = useState("");
 	const [charsLeft, setCharsLeft] = useState(12);
 	const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -36,15 +41,22 @@ export default function Home() {
 		setSavedCode(data.roomCode);
 		setSavedName(data.playerName);
 		setMenu(data.gameMeta.id);
+		setMenuData(data.playerData);
 	});
 
-	socket.on("room/reconnected", (data: RoomReconnectedData) => {
+	socket.on("room/join/error", () => {
+		setSavedCode("");
+		setRoomCode("");
+	});
+
+	socket.on("room/reconnect/success", (data: RoomReconnectedData) => {
 		setSavedCode(data.roomCode);
 		setSavedName(data.playerName);
 		setMenu(data.gameMeta.id);
+		setMenuData(data.playerData);
 	});
 
-	socket.on("room/join/error", (error: RoomJoinErrorData) => {
+	socket.on("room/reconnect/error", () => {
 		setSavedCode("");
 		setRoomCode("");
 	});
@@ -64,7 +76,9 @@ export default function Home() {
 	}, [name]);
 
 	useEffect(() => {
-		setButtonDisabled(roomCode.length !== 4 || name.length === 0 || gameName === "" || gameName === "Room not found");
+		setButtonDisabled(
+			roomCode.length !== 4 || name.length === 0 || gameName === "" || gameName === "Room not found"
+		);
 	}, [roomCode, name, gameName]);
 
 	return (
@@ -83,12 +97,13 @@ export default function Home() {
 								socket.emit("room/join", {
 									deviceID: deviceID,
 									roomCode: roomCode,
-									playerName: name
+									playerName: name,
+									reconnectAttempt: roomCode === savedCode
 								});
 							}}
 							disabled={buttonDisabled}
 						>
-							{(roomCode !== "" && roomCode == savedCode) ? "RECONNECT" : "PLAY"}
+							{roomCode !== "" && roomCode == savedCode ? "RECONNECT" : "PLAY"}
 						</Button>
 						<p className="text-xs font-light text-nowrap">
 							By clicking PLAY, you agree to our{" "}

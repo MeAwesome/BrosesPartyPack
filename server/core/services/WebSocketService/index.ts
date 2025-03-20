@@ -21,7 +21,7 @@ export class WebSocketService extends Service {
 		logger.verbose("Waiting for HTTP service to start...");
 		await HTTPService.waitForActivation();
 		this.socketServer = new Server(HTTPService.getServer().server, {
-			path: "/.proxy/socketio"
+			path: "/socketio"
 		});
 		await this.registerRoutes();
 		logger.verbose("WebSocket service started");
@@ -60,7 +60,7 @@ export class WebSocketService extends Service {
 				const routeEventPath = routePath.split(".")[0];
 				const routeImportPath = path.join("../../../routes/websocket", routePath).replaceAll(path.sep, "/");
 				const routeModule = (await import(routeImportPath)).default;
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 				socket.on(routeEventPath, (args: any[]) => {
 					try {
 						routeModule(socket, ...args);

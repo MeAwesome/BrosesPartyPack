@@ -1,4 +1,4 @@
-import { Center, MeshDistortMaterial, Sphere, Text, Text3D } from "@react-three/drei";
+import { Center, MeshDistortMaterial, Sphere, Text3D } from "@react-three/drei";
 import { animated, SpringValue } from "@react-spring/three";
 
 const AnimatedMeshDistortMaterial = animated(MeshDistortMaterial);
@@ -12,11 +12,12 @@ export default function Player({
 }: {
 	readonly position: [x: number, y: number, z: number];
 	readonly blobColor: SpringValue<string>;
-	readonly textColor: SpringValue<string>;
+	readonly textColor: string | SpringValue<string>;
 	readonly name: string;
 	readonly loaderData: any;
 }) {
 	return (
+		// eslint-disable-next-line react/no-unknown-property
 		<group position={position} rotation={[0, Math.PI / 2, 0]}>
 			<Sphere args={[0.8, 100, 100]}>
 				<AnimatedMeshDistortMaterial speed={5} distort={0.5} color={name == null ? "#787F87" : blobColor} />

@@ -1,8 +1,8 @@
 import { CameraControls, Hud } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
-import { Box, Flex } from "@react-three/flex";
+import { Flex } from "@react-three/flex";
 import { useEffect, useRef, useState } from "react";
-import Phone from "@root/app/components/desktop/chronically-online/home/Phone";
+import Phone from "~/components/desktop/chronically-online/home/Phone";
 import MenuOption from "~/components/desktop/chronically-online/home/MenuOption";
 import { useEventListener } from "usehooks-ts";
 import { useMenu } from "~/hooks/use-menu";
@@ -12,7 +12,13 @@ import { useSpring, useSpringRef } from "@react-spring/three";
 import { useSocket } from "~/hooks/use-socket";
 import { Howl } from "howler";
 import Player from "~/components/desktop/chronically-online/home/Player";
-import { PlayerCreateData, RoomCreatedData, RoomJoinSuccessData, RoomReconnectedData } from "@/services/GameService/types";
+import {
+	PlayerCreateData,
+	RoomCreatedData,
+	RoomJoinSuccessData,
+	RoomReconnectedData
+} from "@/services/GameService/types";
+import proxyURL from "~/lib/proxyURL";
 
 export default function Home({ loaderData }: { readonly loaderData: any }) {
 	const { setMenu } = useMenu();
@@ -38,7 +44,7 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 		[0, -2, -14],
 		[0, -3, -18],
 		[0, -4, -22]
-	]
+	];
 
 	const [backgroundColorSpring] = useSpring(
 		() => ({
@@ -96,8 +102,14 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 
 	const [backgroundMusic] = useState<Howl>(
 		new Howl({
-			src: ["/.proxy/audio/music/chronically-online-main-theme.mp3"],
+			src: [proxyURL("/audio/music/chronically-online-main-theme.mp3")],
 			loop: true
+		})
+	);
+
+	const [playerJoinSFX] = useState<Howl>(
+		new Howl({
+			src: [proxyURL("/audio/sfx/chronicallyonline/player-join.mp3")]
 		})
 	);
 
@@ -107,7 +119,7 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 		setPlayers(playerNames);
 	}
 
-	socket.on("room/created", (data: RoomCreatedData) => {
+	socket.on("room/create/success", (data: RoomCreatedData) => {
 		cameraRef.current?.moveTo(5, 0, -12, true).then(() => {
 			setShowPlayers(true);
 		});
@@ -117,7 +129,7 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 		setSelectedOption(-1);
 	});
 
-	socket.on("room/destroyed", () => {
+	socket.on("room/destroy/success", () => {
 		setShowPlayers(false);
 		setPlayers(Array.from({ length: 10 }));
 		setRoomCode(null);
@@ -131,11 +143,16 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 	});
 
 	socket.on("room/join/success", (data: RoomJoinSuccessData) => {
+		playerJoinSFX.play();
 		updatePlayers(data.players);
 	});
 
-	socket.on("room/reconnected", (data: RoomReconnectedData) => {
+	socket.on("room/reconnect/success", (data: RoomReconnectedData) => {
 		updatePlayers(data.players);
+	});
+
+	socket.on("game/start", () => {
+		setMenu("temp");
 	});
 
 	useEventListener("keydown", (e) => {
@@ -151,6 +168,7 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 					gameID: "chronicallyonline"
 				});
 			} else if (selectedOption == 1) {
+				// TODO: Implement settings
 			} else if (selectedOption == 2) {
 				backgroundMusic.stop();
 				setMenu("main");
@@ -188,9 +206,17 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 				<MenuOption option={"QUIT"} selected={selectedOption == 2} loaderData={loaderData} />
 			</Flex>
 			<Hud renderPriority={showPlayers ? 1 : 0}>
+				{/* eslint-disable-next-line react/no-unknown-property */}
 				<ambientLight intensity={3.1} />
 				{players.map((player, index) => (
-					<Player key={index} position={playerPositions[index]} blobColor={backgroundColorSpring.color} textColor={phoneColorSpring.color} name={player} loaderData={loaderData} />
+					<Player
+						key={index}
+						position={playerPositions[index] as [number, number, number]}
+						blobColor={backgroundColorSpring.color}
+						textColor={index == 0 ? "#F6AE2D" : phoneColorSpring.color}
+						name={player}
+						loaderData={loaderData}
+					/>
 				))}
 			</Hud>
 			<CameraControls camera={camera} ref={cameraRef} />

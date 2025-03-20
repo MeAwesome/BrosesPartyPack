@@ -16,7 +16,7 @@ export function SocketProvider({ children, config }: SocketProviderProps) {
 	// @ts-expect-error testing
 	if (!socketRef.current && config.enabled) {
 		socketRef.current = io({
-			path: "/.proxy/socketio"
+			path: "/socketio"
 		});
 		// @ts-expect-error testing
 		if (config.latencyCheck.enabled) {
@@ -32,6 +32,10 @@ export function SocketProvider({ children, config }: SocketProviderProps) {
 	}
 
 	useEffect(() => {
+		const isDiscordActivity = window.location.href.includes("discordsays.com");
+		if (isDiscordActivity && socketRef.current) {
+			socketRef.current.io.opts.path = "/.proxy/socketio";
+		}
 		return () => {
 			socketRef.current?.disconnect();
 		};

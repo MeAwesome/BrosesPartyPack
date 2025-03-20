@@ -40,6 +40,14 @@ export class TimingsService extends Service {
 		this.timings.set(key, interval);
 	}
 
+	public async sleep(delay: number): Promise<void> {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve();
+			}, delay);
+		});
+	}
+
 	public clearTiming(key: string): void {
 		if (this.timings.has(key)) {
 			clearTimeout(this.timings.get(key));
