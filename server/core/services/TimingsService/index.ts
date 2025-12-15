@@ -40,11 +40,21 @@ export class TimingsService extends Service {
 		this.timings.set(key, interval);
 	}
 
-	public async sleep(delay: number): Promise<void> {
+	public async sleep(delay: number, key?: string): Promise<void> {
 		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve();
-			}, delay);
+			if (key) {
+				this.setTimeout(
+					key,
+					() => {
+						resolve();
+					},
+					delay
+				);
+			} else {
+				setTimeout(() => {
+					resolve();
+				}, delay);
+			}
 		});
 	}
 

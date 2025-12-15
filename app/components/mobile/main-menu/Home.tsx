@@ -17,7 +17,7 @@ import {
 } from "@/services/GameService/types";
 
 export default function Home() {
-	const { setMenu, setMenuData } = useMenu();
+	const { setMenu, setMenuData, setSubMenu } = useMenu();
 	const socket = useSocket();
 
 	const deviceID = useReadLocalStorage("deviceID");
@@ -41,6 +41,7 @@ export default function Home() {
 		setSavedCode(data.roomCode);
 		setSavedName(data.playerName);
 		setMenu(data.gameMeta.id);
+		setSubMenu(data.playerData.screen);
 		setMenuData(data.playerData);
 	});
 
@@ -53,6 +54,7 @@ export default function Home() {
 		setSavedCode(data.roomCode);
 		setSavedName(data.playerName);
 		setMenu(data.gameMeta.id);
+		setSubMenu(data.playerData.screen);
 		setMenuData(data.playerData);
 	});
 

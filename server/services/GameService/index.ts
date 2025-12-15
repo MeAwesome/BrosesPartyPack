@@ -95,6 +95,16 @@ export class GameService extends Service {
 		}
 	}
 
+	public setRoomUnreadyBySocket(socket: Socket) {
+		const roomCode = this.getRoomCodeBySocket(socket);
+		if (roomCode) {
+			const game = this.games.get(roomCode);
+			if (game) {
+				game.unready();
+			}
+		}
+	}
+
 	public getRoomCodeBySocket(socket: Socket): string | undefined {
 		const rooms = Array.from(socket.rooms);
 		const roomCode = rooms.find((room) => this.games.has(room));

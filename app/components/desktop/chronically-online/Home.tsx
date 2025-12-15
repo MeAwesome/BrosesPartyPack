@@ -13,6 +13,7 @@ import { useSocket } from "~/hooks/use-socket";
 import { Howl } from "howler";
 import Player from "~/components/desktop/chronically-online/home/Player";
 import {
+	GameCountdownData,
 	PlayerCreateData,
 	RoomCreatedData,
 	RoomJoinSuccessData,
@@ -21,7 +22,7 @@ import {
 import proxyURL from "~/lib/proxyURL";
 
 export default function Home({ loaderData }: { readonly loaderData: any }) {
-	const { setMenu } = useMenu();
+	const { setMenu, setSubMenu } = useMenu();
 	const socket = useSocket();
 	const cameraRef = useRef<CameraControls>(null);
 	const [selectedOption, setSelectedOption] = useState(0);
@@ -29,6 +30,7 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 	const [freezeBack, setFreezeBack] = useState(false);
 	const camera = useThree((state) => state.camera);
 	const [phoneState, setPhoneState] = useState(0);
+	const [countdown, setCountdown] = useState(0);
 	const phoneApi = useSpringRef();
 	const [roomCode, setRoomCode] = useState<string | null>(null);
 	const [showPlayers, setShowPlayers] = useState(false);
@@ -151,8 +153,38 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 		updatePlayers(data.players);
 	});
 
+	socket.on("game/unready", () => {
+		setCountdown(0);
+		setPhoneState(2);
+	});
+
+	socket.on("game/countdown", (data: GameCountdownData) => {
+		setCountdown(data.countdown);
+		setPhoneState(4);
+	});
+
 	socket.on("game/start", () => {
-		setMenu("temp");
+		setPhoneState(5);
+		setFreezeSelection(true);
+		setFreezeBack(true);
+		phoneApi.update({
+			from: {
+				position: [5, 0, -12],
+				rotation: [0, Math.PI / 2, 0]
+			},
+			to: {
+				position: [10, 4, -12],
+				rotation: [Math.PI / 2 + 0.2, Math.PI / 3 + 0.2, -0.4]
+			},
+			reverse: false,
+			config: {
+				duration: 700
+			},
+			onRest: () => {
+				setSubMenu("instructions");
+			}
+		});
+		phoneApi.start();
 	});
 
 	useEventListener("keydown", (e) => {
@@ -190,15 +222,6 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 	return (
 		<>
 			<Background color={backgroundColorSpring.color} />
-			<Phone
-				loaderData={loaderData}
-				state={phoneState}
-				syncedColor={backgroundColorSpring.color}
-				reverseSyncedColor={phoneColorSpring.color}
-				position={phonePositionSpring.position}
-				rotation={phonePositionSpring.rotation}
-				roomCode={roomCode}
-			/>
 			<Blob color={backgroundColorSpring.color} />
 			<Flex justifyContent="center" alignItems="flex-end" position={[8, 0, 0]} rotation={[0, -0.4, 0]}>
 				<MenuOption option={"PLAY"} selected={selectedOption == 0} loaderData={loaderData} />
@@ -218,6 +241,20 @@ export default function Home({ loaderData }: { readonly loaderData: any }) {
 						loaderData={loaderData}
 					/>
 				))}
+			</Hud>
+			<Hud renderPriority={showPlayers ? 2 : 1}>
+				{/* eslint-disable-next-line react/no-unknown-property */}
+				<ambientLight intensity={3.1} />
+				<Phone
+					loaderData={loaderData}
+					state={phoneState}
+					syncedColor={backgroundColorSpring.color}
+					reverseSyncedColor={phoneColorSpring.color}
+					position={phonePositionSpring.position}
+					rotation={phonePositionSpring.rotation}
+					roomCode={roomCode}
+					countdown={countdown}
+				/>
 			</Hud>
 			<CameraControls camera={camera} ref={cameraRef} />
 		</>

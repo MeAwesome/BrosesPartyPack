@@ -9,7 +9,8 @@ export default function Phone({
 	reverseSyncedColor,
 	position,
 	rotation,
-	roomCode
+	roomCode,
+	countdown
 }: {
 	readonly loaderData: any;
 	readonly state: number;
@@ -18,6 +19,7 @@ export default function Phone({
 	readonly position: SpringValue<number[]>;
 	readonly rotation: SpringValue<number[]>;
 	readonly roomCode: string | null;
+	readonly countdown: number;
 }) {
 	return (
 		<animated.group position={position} rotation={rotation}>
@@ -37,6 +39,9 @@ export default function Phone({
 				/>
 			)}
 			{state == 3 && <ExitingState loaderData={loaderData} reverseSyncedColor={reverseSyncedColor} />}
+			{state == 4 && (
+				<CountdownState loaderData={loaderData} reverseSyncedColor={reverseSyncedColor} countdown={countdown} />
+			)}
 		</animated.group>
 	);
 }
@@ -121,6 +126,25 @@ function ExitingState({
 		<Center front position={[-4.5, 1.5, 0.3]} rotation={[1.4, 0.2, -0.4]}>
 			<Text3D font={loaderData.fonts.monoton} size={0.2} height={0.045} rotation={[-1.6, 0, 0]}>
 				{"Exiting\nRoom"}
+				<animated.meshBasicMaterial color={reverseSyncedColor} />
+			</Text3D>
+		</Center>
+	);
+}
+
+function CountdownState({
+	loaderData,
+	reverseSyncedColor,
+	countdown
+}: {
+	readonly loaderData: any;
+	readonly reverseSyncedColor: SpringValue<string>;
+	readonly countdown: number;
+}) {
+	return (
+		<Center front position={[-4, 1, 0.3]} rotation={[1.4, 0.2, -0.4]}>
+			<Text3D font={loaderData.fonts.monoton} size={1} height={0.045} rotation={[-1.6, 0, 0]}>
+				{countdown}
 				<animated.meshBasicMaterial color={reverseSyncedColor} />
 			</Text3D>
 		</Center>

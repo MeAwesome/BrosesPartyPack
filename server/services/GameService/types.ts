@@ -24,6 +24,7 @@ export type PlayerCreateData = {
 	playerName: string;
 	roomCode: string;
 	isHost: boolean;
+	screen: string;
 };
 
 export type RoomSearchData = {

@@ -11,6 +11,7 @@ export default class Game {
 	protected meta: GameMeta;
 	protected players: Map<string, Player>;
 	protected allowNewPlayers: boolean;
+	protected started: boolean;
 
 	constructor(data: RoomCreateData) {
 		this.gameID = data.gameID;
@@ -18,6 +19,7 @@ export default class Game {
 		this.meta = GameService.getMetaForGame(data.gameID);
 		this.players = new Map<string, Player>();
 		this.allowNewPlayers = true;
+		this.started = false;
 	}
 
 	public getCode(): string {
@@ -48,7 +50,8 @@ export default class Game {
 				deviceID: data.deviceID,
 				playerName: data.playerName,
 				roomCode: this.code,
-				isHost: this.players.size === 0
+				isHost: this.players.size === 0,
+				screen: "home"
 			});
 			this.players.set(data.deviceID, player);
 			this.emit("room/join/success", {
@@ -67,13 +70,32 @@ export default class Game {
 	}
 
 	public async ready(): Promise<void> {
+		if (this.started) return;
+		this.allowNewPlayers = false;
 		for (let i = 3; i > 0; i--) {
+			if (this.allowNewPlayers) return;
 			this.emit("game/countdown", {
 				countdown: i
 			});
-			await TimingsService.sleep(1000);
+			await TimingsService.sleep(1000, `${this.code}-countdown`);
 		}
+		if (this.allowNewPlayers) return;
+		this.started = true;
+		this.setPlayerScreens("blank");
 		this.emit("game/start");
+	}
+
+	public async unready(): Promise<void> {
+		if (this.started) return;
+		this.allowNewPlayers = true;
+		TimingsService.clearTiming(`${this.code}-countdown`);
+		this.emit("game/unready");
+	}
+
+	public setPlayerScreens(screen: string): void {
+		this.players.forEach((player) => {
+			player.setScreen(screen);
+		});
 	}
 
 	public emit(event: string, data?: any): void {

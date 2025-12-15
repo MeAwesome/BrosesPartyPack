@@ -10,8 +10,9 @@
 
 ## ending loop:
 
-
-- trivia questions about who said what
+- correct answer +10%? score
+- incorrect answer -5%? score
+- 5? trivia questions about who said what
     - choice based game
     - pull random message 10+ words long
         - player in first gets 5 choices

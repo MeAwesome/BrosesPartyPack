@@ -5,12 +5,14 @@ export default class Player {
 	protected playerName: string;
 	protected roomCode: string;
 	protected isHost: boolean;
+	protected screen: string;
 
 	constructor(data: PlayerCreateData) {
 		this.deviceID = data.deviceID;
 		this.playerName = data.playerName;
 		this.roomCode = data.roomCode;
 		this.isHost = data.isHost;
+		this.screen = data.screen;
 	}
 
 	public getDeviceID() {
@@ -27,5 +29,17 @@ export default class Player {
 
 	public setPlayerName(playerName: string) {
 		this.playerName = playerName;
+	}
+
+	public isPlayerHost() {
+		return this.isHost;
+	}
+
+	public getScreen() {
+		return this.screen;
+	}
+
+	public setScreen(screen: string) {
+		this.screen = screen;
 	}
 }

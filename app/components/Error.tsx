@@ -1,8 +1,10 @@
 import { useMenu } from "~/hooks/use-menu";
 import { Button } from "~/components/shadcn/ui/button";
+import { useSocket } from "~/hooks/use-socket";
 
 export default function Error() {
 	const { menu, subMenu, resetMenu } = useMenu();
+	const socket = useSocket();
 	return (
 		<div className="flex flex-col items-center justify-center h-full">
 			<div className="flex flex-col items-center justify-center">
@@ -10,7 +12,13 @@ export default function Error() {
 				<h3 className="text-xl text-red-500">Unknown Menu Reached</h3>
 				<p className="text-white">Menu: {menu}</p>
 				<p className="text-white">Sub Menu: {subMenu}</p>
-				<Button className="mt-4" onClick={resetMenu}>
+				<Button
+					className="mt-4"
+					onClick={() => {
+						resetMenu();
+						socket.emit("room/destroy");
+					}}
+				>
 					Reset Menu State
 				</Button>
 			</div>
